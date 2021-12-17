@@ -37,8 +37,15 @@ Refer to the [Velero documentation](https://velero.io/docs/) for more advanced t
 ### Configure Backend Object Store
 
 Velero requires a backend object store where it will save your backups.
-For the initial install the local Ceph Object Gateway will be configured as the backend if the Rook add-on is enabled.
-This is not suitable for disaster recovery because loss of the cluster will mean loss of backups.
+
+For the initial install, a storage location inside the cluster will be used as the default in this order of precedence:
+1. The `kotsadm.disableS3` flag is set to `true` in the installer spec. A Persistent Volume (PV) will be used as the storage backend.
+1. There is an object storage provider in the cluster. This could be satisfied by the Rook or Minio addons.
+1. Given none of these conditions, no default storage location will be configured.
+You can also decide to move between these "Internal" storage locations. See [Removing Minio](/docs/install-with-kurl/removing-minio) for more information on this migration.
+
+None of these "Internal" locations are suitable for disaster recovery because loss of the cluster will mean loss of backups. 
+
 The add-on includes plugins for using AWS, Azure, or GCP object stores as backends, as well as the [local-volume-provider](https://github.com/replicatedhq/local-volume-provider) plugin for direct-to-disk backups.
 
 #### AWS S3
